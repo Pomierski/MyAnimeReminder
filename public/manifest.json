@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+
+  "name": "MyAnimeReminder",
+  "description": "Don't miss the latest episodes release",
+  "version": "0.0.1",
+
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "MyAnimeReminder"
+  },
+  "icons": {
+    "16": "logo-small.png",
+    "48": "logo-small.png",
+    "128": "logo-small.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": ["storage"]
+}

@@ -68,11 +68,11 @@ dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
 chrome.runtime.onStartup.addListener(async () => {
   const data = await getStorageData("MARData");
   if ("listLastUpdateDate" in data) {
+    
     let listLastUpdateDate = new Date(data.listLastUpdateDate);
     const newNotifications = [];
 
-    if (listLastUpdateDate < dateWeekAgo);
-    listLastUpdateDate = dateWeekAgo;
+    if (listLastUpdateDate < dateWeekAgo) listLastUpdateDate = dateWeekAgo;
 
     while (listLastUpdateDate < currentDate) {
       const [scheudle, animeList] = await Promise.all([

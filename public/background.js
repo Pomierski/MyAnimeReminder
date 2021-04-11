@@ -44,9 +44,12 @@ const getStorageData = (key) =>
 const setNextUpdateDate = () => {
   const nextMidnight = new Date().setHours(24, 0, 0, 0);
   chrome.storage.sync.get(["MARData"], (result) => {
-    result.listLastUpdateDate = nextMidnight;
     chrome.storage.sync.set({
-      result,
+      MARData: {
+        username: result.username,
+        animeList: result.optimizedData,
+        listLastUpdateDate: nextMidnight,
+      },
     });
   });
 };
@@ -68,7 +71,6 @@ dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
 chrome.runtime.onStartup.addListener(async () => {
   const data = await getStorageData("MARData");
   if ("listLastUpdateDate" in data) {
-    
     let listLastUpdateDate = new Date(data.listLastUpdateDate);
     const newNotifications = [];
 

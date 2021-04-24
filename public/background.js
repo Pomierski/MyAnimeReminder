@@ -46,8 +46,8 @@ const setNextUpdateDate = () => {
   chrome.storage.sync.get(["MARData"], (result) => {
     chrome.storage.sync.set({
       MARData: {
-        username: result.username,
-        animeList: result.optimizedData,
+        username: result["MARData"].username,
+        animeList: result["MARData"].animeList,
         listLastUpdateDate: nextMidnight,
       },
     });

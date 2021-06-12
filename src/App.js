@@ -23,13 +23,15 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [userLogged, setUserLogged] = useState(false);
   const [userNotifications, setUserNotifications] = useState(null);
+  const [userScheudle, setUserScheudle] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
   const getUserData = async () => {
-    const [savedData, savedNotifications] = await Promise.all([
-      chromeAPI.getStorageData(["MARData"]),
-      chromeAPI.getStorageData(["MARNotifications"]),
+    const [savedData, savedNotifications, savedScheudle] = await Promise.all([
+      chromeAPI.getStorageData([chromeAPI.userDataKey]),
+      chromeAPI.getStorageData([chromeAPI.notificationsKey]),
+      chromeAPI.getStorageData([chromeAPI.scheudleKey]),
     ]);
     if (Object.keys(savedData).length) {
       setUserData(savedData);
@@ -37,6 +39,9 @@ function App() {
     }
     if (Object.keys(savedNotifications).length)
       setUserNotifications(savedNotifications);
+    if (Object.keys(savedScheudle).length) {
+      setUserScheudle(savedScheudle);
+    }
   };
 
   useLayoutEffect(() => {
@@ -71,6 +76,7 @@ function App() {
     setUserLogged(false);
     setShowSettings(false);
     chromeAPI.clearNotifications();
+    chromeAPI.clearScheudle();
   };
   return (
     <div className="App">
@@ -102,6 +108,7 @@ function App() {
                     : null
                 }
                 animeList={userData ? userData.animeList : null}
+                scheudle={userScheudle}
                 refreshData={refreshData}
               />
             </>

@@ -82,8 +82,8 @@ const AnimeCard = ({
   title,
   progress,
   progressMax,
-  aired,
-  endDate,
+  airingDay,
+  airingDate,
   type,
 }) => (
   <Wrapper>
@@ -101,8 +101,8 @@ const AnimeCard = ({
     </CardHeader>
     <Desc>
       <p>Type: {type}</p>
-      <p>Aired: {aired}</p>
-      <p>Est. end date: {endDate}</p>
+      <p>Next episode: {airingDay}</p>
+      <p>{airingDate}</p>
     </Desc>
     <ProgressBarWrapper>
       <ProgressBar progress={progress} max={progressMax} />

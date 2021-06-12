@@ -36,7 +36,6 @@ const Main = ({
       {animeList && animeList.length ? (
         animeList.map(
           ({
-            url,
             mal_id,
             title,
             image_url,
@@ -48,7 +47,7 @@ const Main = ({
           }) => {
             return (
               <AnimeCard
-                animeUrl={url}
+                mal_id={mal_id}
                 key={mal_id}
                 title={title}
                 imgUrl={image_url}

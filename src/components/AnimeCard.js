@@ -77,7 +77,7 @@ const StyledA = styled.a`
 `;
 
 const AnimeCard = ({
-  animeUrl,
+  mal_id,
   imgUrl,
   title,
   progress,
@@ -92,7 +92,7 @@ const AnimeCard = ({
     </CardImg>
     <CardHeader>
       <StyledA
-        href={animeUrl}
+        href={`https://myanimelist.net/anime/${mal_id}`}
         target="_blank"
         rel="nofollow noopener noreferrer"
       >

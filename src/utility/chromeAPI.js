@@ -2,14 +2,9 @@
 
 export const userDataKey = "MARData";
 export const notificationsKey = "MARNotifications";
-export const scheudleKey = "MARScheudle";
 
 export const clearStorage = () => {
   chrome.storage.sync.remove([userDataKey]);
-};
-
-export const clearScheudle = () => {
-  chrome.storage.sync.remove([scheudleKey]);
 };
 
 export const clearNotifications = () => {

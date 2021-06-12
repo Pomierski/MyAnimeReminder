@@ -2,25 +2,60 @@
 
 const nextMidnight = new Date().setHours(24, 0, 0, 0);
 
-const fetchScheudle = () =>
-  fetch(`https://api.jikan.moe/v3/schedule`)
-    .then((response) => response.json())
-    .then((response) => {
-      let allDaysScheudle = [];
-      const daysArray = [
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday",
-      ];
-      daysArray.forEach((el) => {
-        allDaysScheudle = [...allDaysScheudle, ...response[el]];
-      });
-      return allDaysScheudle;
-    });
+const getFullScheudleForList = async (username) => {
+  const today = new Date();
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ];
+  let userListScheudle = [];
+
+  const animeList = await fetchWatching(username);
+
+  for (const day of days) {
+    const capitalizeDay = day.charAt(0).toUpperCase() + day.slice(1);
+    const scheudle = await fetch(`https://api.jikan.moe/v3/schedule/${day}`)
+      .then((resp) => resp.json())
+      .then((resp) => resp[day]);
+
+    const episodeAiringDate = new Date();
+    episodeAiringDate.setDate(
+      episodeAiringDate.getDate() - today.getDay() + (days.indexOf(day) + 1)
+    );
+    userListScheudle = [
+      ...userListScheudle,
+      ...scheudle
+        .filter(
+          (scheudleItem) =>
+            animeList.anime.filter((animeListItem) => {
+              if (animeListItem.mal_id === scheudleItem.mal_id) {
+                scheudleItem.watched_episodes = animeListItem.watched_episodes;
+                return true;
+              } else return false;
+            }).length
+        )
+        .map((anime) => {
+          return {
+            mal_id: anime.mal_id,
+            title: anime.title,
+            image_url: anime.image_url,
+            type: anime.type,
+            airingDate: episodeAiringDate.getTime(),
+            airingDay: capitalizeDay,
+            episodes: anime.episodes,
+            watched_episodes: anime.watched_episodes,
+          };
+        }),
+    ];
+  }
+
+  return userListScheudle;
+};
 
 const fetchWatching = (username) =>
   fetch(`https://api.jikan.moe/v3/user/${username}/animelist/watching`).then(
@@ -31,40 +66,13 @@ const fetchWatching = (username) =>
   );
 
 export const fetchUserList = async (username) => {
-  const [animeList, scheudle] = await Promise.all([
-    fetchWatching(username),
-    fetchScheudle(),
-  ]);
-  if (animeList && scheudle) {
-    const optimizedData = [];
-    const animeListWithCorrectData = scheudle.filter(
-      (scheudleItem) =>
-        animeList.anime.filter((animeListItem) => {
-          if (animeListItem.mal_id === scheudleItem.mal_id) {
-            scheudleItem.watched_episodes = animeListItem.watched_episodes;
-            return true;
-          }
-          return false;
-        }).length
-    );
+  const animeList = await getFullScheudleForList(username);
 
-    animeListWithCorrectData.forEach((el) => {
-      optimizedData.push({
-        mal_id: el.mal_id,
-        title: el.title,
-        url: el.url,
-        image_url: el.image_url,
-        airing_start: el.airing_start,
-        episodes: el.episodes,
-        watched_episodes: el.watched_episodes,
-        type: el.type,
-      });
-    });
-
+  if (animeList) {
     chrome.storage.sync.set({
       MARData: {
         username: username,
-        animeList: optimizedData,
+        animeList: animeList,
         listLastUpdateDate: nextMidnight,
       },
     });

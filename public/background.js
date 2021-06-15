@@ -1,27 +1,90 @@
 /* global chrome */
 
-const getDayStringFromDate = (date) =>
-  date.toLocaleString("en-us", { weekday: "long" }).toLowerCase();
-
-const fetchScheulde = (day) =>
-  fetch(`https://api.jikan.moe/v3/schedule/${day}`).then((response) =>
-    response.json().then((response) => {
-      const optimizedData = response[day].map(
-        ({ mal_id, title, airing_start, image_url }) => ({
-          mal_id,
-          title,
-          airing_start,
-          image_url,
-        })
-      );
-      return optimizedData;
-    })
+const fetchWatching = (username) =>
+  fetch(`https://api.jikan.moe/v3/user/${username}/animelist/watching`).then(
+    (response) => {
+      if (response.ok) return response.json();
+      else return Promise.reject({ status: response.status });
+    }
   );
 
-const fetchAnimeList = (username) =>
-  fetch(
-    `https://api.jikan.moe/v3/user/${username}/animelist/watching`
-  ).then((response) => response.json());
+const getFullScheudleForList = async (username) => {
+  const today = new Date();
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ];
+  let userListScheudle = [];
+
+  const animeList = await fetchWatching(username);
+
+  for (const day of days) {
+    const capitalizeDay = day.charAt(0).toUpperCase() + day.slice(1);
+    const scheudle = await fetch(`https://api.jikan.moe/v3/schedule/${day}`)
+      .then((resp) => resp.json())
+      .then((resp) => resp[day]);
+
+    const episodeAiringDate = new Date();
+    episodeAiringDate.setDate(
+      episodeAiringDate.getDate() - today.getDay() + (days.indexOf(day) + 1)
+    );
+    userListScheudle = [
+      ...userListScheudle,
+      ...scheudle
+        .filter(
+          (scheudleItem) =>
+            animeList.anime.filter((animeListItem) => {
+              if (animeListItem.mal_id === scheudleItem.mal_id) {
+                scheudleItem.watched_episodes = animeListItem.watched_episodes;
+                return true;
+              } else return false;
+            }).length
+        )
+        .map((anime) => {
+          return {
+            mal_id: anime.mal_id,
+            title: anime.title,
+            image_url: anime.image_url,
+            type: anime.type,
+            airingDate: episodeAiringDate.getTime(),
+            airingDay: capitalizeDay,
+            episodes: anime.episodes,
+            watched_episodes: anime.watched_episodes,
+          };
+        }),
+    ];
+  }
+
+  return userListScheudle;
+};
+
+const chromeAPI = {
+  userDataKey: "MARData",
+  notificationsKey: "MARNotifications",
+  getStorageData(key) {
+    return new Promise((resolve, reject) =>
+      chrome.storage.sync.get(key, (result) =>
+        chrome.runtime.lastError
+          ? reject(Error(chrome.runtime.lastError.message))
+          : resolve(key in result ? result[key] : result)
+      )
+    );
+  },
+  setStorageData(value) {
+    return new Promise((resolve, reject) =>
+      chrome.storage.sync.set(value, () =>
+        chrome.runtime.lastError
+          ? reject(Error(chrome.runtime.lastError.message))
+          : resolve(resolve)
+      )
+    );
+  },
+};
 
 const setExtensionBadgeText = (text) => {
   chrome.browserAction.setBadgeBackgroundColor({
@@ -32,88 +95,63 @@ const setExtensionBadgeText = (text) => {
   });
 };
 
-const getStorageData = (key) =>
-  new Promise((resolve, reject) =>
-    chrome.storage.sync.get(key, (result) =>
-      chrome.runtime.lastError
-        ? reject(Error(chrome.runtime.lastError.message))
-        : resolve(key in result ? result[key] : result)
-    )
-  );
-
-const setNextUpdateDate = () => {
+const setNextUpdateDate = async () => {
   const nextMidnight = new Date().setHours(24, 0, 0, 0);
-  chrome.storage.sync.get(["MARData"], (result) => {
-    chrome.storage.sync.set({
-      MARData: {
-        username: result["MARData"].username,
-        animeList: result["MARData"].animeList,
-        listLastUpdateDate: nextMidnight,
-      },
-    });
-  });
-};
-
-const updateNotifications = (notifications) => {
-  chrome.storage.sync.set({
-    MARNotifications: {
-      notifications: notifications,
+  const data = await chromeAPI.getStorageData([chromeAPI.userDataKey]);
+  chromeAPI.setStorageData({
+    MARData: {
+      username: data.username,
+      animeList: data.animeList,
+      listLastUpdateDate: nextMidnight,
     },
   });
 };
 
-const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+const updateNotifications = async (newNotifications) => {
+  const notificationsData = await chromeAPI.getStorageData(
+    chromeAPI.notificationsKey
+  );
+  let notifications =
+    "notifications" in notificationsData ? notificationsData.notifications : [];
 
-const currentDate = new Date();
-const dateWeekAgo = new Date();
-dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
+  const mergedNotificationsArray = [...notifications, ...newNotifications];
+
+  setExtensionBadgeText(mergedNotificationsArray.length.toString());
+  setNextUpdateDate();
+
+  chromeAPI.setStorageData({
+    MARNotifications: {
+      notifications: mergedNotificationsArray,
+    },
+  });
+};
 
 chrome.runtime.onStartup.addListener(async () => {
-  const data = await getStorageData("MARData");
+  const data = await chromeAPI.getStorageData(chromeAPI.userDataKey);
   if ("listLastUpdateDate" in data) {
+    const currentDate = new Date();
+    const lastMonday = new Date();
+    lastMonday.setDate(lastMonday.getDate() - currentDate.getDay() + 1);
     let listLastUpdateDate = new Date(data.listLastUpdateDate);
-    const newNotifications = [];
 
-    if (listLastUpdateDate < dateWeekAgo) listLastUpdateDate = dateWeekAgo;
-
-    while (listLastUpdateDate < currentDate) {
-      const [scheudle, animeList] = await Promise.all([
-        fetchScheulde(getDayStringFromDate(listLastUpdateDate)),
-        fetchAnimeList(data.username),
-      ]);
-      const animesAiringToday = scheudle.filter(
-        (scheudleItem) =>
-          animeList.anime.filter(
-            (animeListItem) => animeListItem.mal_id === scheudleItem.mal_id
-          ).length
-      );
-
-      animesAiringToday.forEach((item) => {
-        item.aired = listLastUpdateDate.toISOString();
-        item.id = Math.random().toString(36).substr(2, 9);
-      });
-
-      newNotifications.push(...animesAiringToday);
-      listLastUpdateDate.setDate(listLastUpdateDate.getDate() + 1);
-      //JikanAPI Rate Limiting
-      await timer(500);
+    if (listLastUpdateDate < lastMonday) {
+      await getFullScheudleForList(data.username);
     }
 
-    if (newNotifications.length) {
-      const notificationsData = await getStorageData("MARNotifications");
-      let prevNotifications = [];
+    if (listLastUpdateDate < currentDate) {
+      const newNotifications = [];
+      data.animeList.forEach((anime) => {
+        const airingDate = new Date(anime.airingDate);
+        if (airingDate.getDate() === currentDate.getDate()) {
+          anime.aired = airingDate.toISOString();
+          anime.id = Math.random().toString(36).substr(2, 9);
+          newNotifications.push(anime);
+        }
+      });
 
-      if ("notifications" in notificationsData)
-        prevNotifications = notificationsData.notifications;
-
-      const mergedNotificationsArray = [
-        ...newNotifications,
-        ...prevNotifications,
-      ];
-
-      setExtensionBadgeText(mergedNotificationsArray.length.toString());
-      setNextUpdateDate();
-      updateNotifications(mergedNotificationsArray);
+      if (newNotifications.length) {
+        updateNotifications(newNotifications);
+      }
     }
   }
 });

@@ -77,13 +77,13 @@ const StyledA = styled.a`
 `;
 
 const AnimeCard = ({
-  animeUrl,
+  mal_id,
   imgUrl,
   title,
   progress,
   progressMax,
-  aired,
-  endDate,
+  airingDay,
+  airingDate,
   type,
 }) => (
   <Wrapper>
@@ -92,7 +92,7 @@ const AnimeCard = ({
     </CardImg>
     <CardHeader>
       <StyledA
-        href={animeUrl}
+        href={`https://myanimelist.net/anime/${mal_id}`}
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
@@ -101,8 +101,8 @@ const AnimeCard = ({
     </CardHeader>
     <Desc>
       <p>Type: {type}</p>
-      <p>Aired: {aired}</p>
-      <p>Est. end date: {endDate}</p>
+      <p>Next episode: {airingDay}</p>
+      <p>{airingDate}</p>
     </Desc>
     <ProgressBarWrapper>
       <ProgressBar progress={progress} max={progressMax} />

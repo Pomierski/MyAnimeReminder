@@ -2,8 +2,20 @@ const currentDate = new Date();
 
 export const setTimeToMidnight = (date) => {
   const fixedDate = new Date(date);
-  fixedDate.setHours(24, 0, 0, 0);
+  fixedDate.setHours(0, 0, 0, 0);
   return fixedDate;
+};
+
+export const parseDate = (date) => {
+  date = new Date(date);
+  date = setTimeToMidnight(date);
+  const parsedDate = date.toLocaleDateString("en", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  return parsedDate;
 };
 
 export const getEndDateForAnime = (startDate, totalEpisodes) => {
@@ -13,7 +25,7 @@ export const getEndDateForAnime = (startDate, totalEpisodes) => {
     month: "long",
     day: "numeric",
   });
-  
+
   const endDate = startDate;
   endDate.setDate(endDate.getDate() + parseInt(totalEpisodes) * 7);
 

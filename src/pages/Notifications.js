@@ -33,7 +33,7 @@ const Notifications = ({
           </Button>
         </HeaderButtons>
       </Header>
-      {userNotifications ? (
+      {userNotifications && userNotifications.notifications.length ? (
         <>
           {userNotifications.notifications.map(
             ({ image_url, title, airing_start, aired, id }) => (

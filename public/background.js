@@ -117,7 +117,6 @@ const updateNotifications = async (newNotifications) => {
   const mergedNotificationsArray = [...notifications, ...newNotifications];
 
   setExtensionBadgeText(mergedNotificationsArray.length.toString());
-  setNextUpdateDate();
 
   chromeAPI.setStorageData({
     MARNotifications: {
@@ -138,11 +137,11 @@ chrome.runtime.onStartup.addListener(async () => {
       await getFullScheudleForList(data.username);
     }
 
-    if (listLastUpdateDate < currentDate) {
+    while (listLastUpdateDate < currentDate) {
       const newNotifications = [];
       data.animeList.forEach((anime) => {
         const airingDate = new Date(anime.airingDate);
-        if (airingDate.getDate() === currentDate.getDate()) {
+        if (airingDate.getDate() <= currentDate.getDate()) {
           anime.aired = airingDate.toISOString();
           anime.id = Math.random().toString(36).substr(2, 9);
           newNotifications.push(anime);
@@ -152,6 +151,9 @@ chrome.runtime.onStartup.addListener(async () => {
       if (newNotifications.length) {
         updateNotifications(newNotifications);
       }
+
+      listLastUpdateDate.setDate(listLastUpdateDate.getDate + 1);
     }
+    setNextUpdateDate();
   }
 });

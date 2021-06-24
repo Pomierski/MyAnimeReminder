@@ -27,7 +27,7 @@ function App() {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const getUserData = async () => {
-    const [savedData, savedNotifications, savedScheudle] = await Promise.all([
+    const [savedData, savedNotifications] = await Promise.all([
       chromeAPI.getStorageData([chromeAPI.userDataKey]),
       chromeAPI.getStorageData([chromeAPI.notificationsKey]),
     ]);

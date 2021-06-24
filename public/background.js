@@ -141,7 +141,7 @@ chrome.runtime.onStartup.addListener(async () => {
       const newNotifications = [];
       data.animeList.forEach((anime) => {
         const airingDate = new Date(anime.airingDate);
-        if (airingDate.getDate() <= currentDate.getDate()) {
+        if (airingDate <= currentDate && airingDate > listLastUpdateDate) {
           anime.aired = airingDate.toISOString();
           anime.id = Math.random().toString(36).substr(2, 9);
           newNotifications.push(anime);

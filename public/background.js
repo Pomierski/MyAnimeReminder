@@ -63,10 +63,23 @@ const getFullScheudleForList = async (username) => {
   return userListScheudle;
 };
 
-const getMonthDateCompare = (date, date2) =>
-  date.getMonth() === date2.getMonth()
-    ? date.getDate() > date2.getDate()
-    : date.getMonth() > date2.getMonth();
+const checkIfAnimeAired = (
+  airingDate,
+  listLastUpdateDate,
+  currentDate = new Date()
+) => {
+  if (airingDate.getDate() === currentDate.getDate()) {
+    return true;
+  }
+
+  if (airingDate < currentDate) {
+    if (airingDate.getMonth() === listLastUpdateDate.getMonth()) {
+      return airingDate.getDate() > listLastUpdateDate.getDate();
+    } else if (airingDate.getMonth() !== listLastUpdateDate.getMonth()) {
+      return airingDate.getMonth() > listLastUpdateDate.getMonth();
+    }
+  }
+};
 
 const chromeAPI = {
   userDataKey: "MARData",
@@ -146,10 +159,7 @@ chrome.runtime.onStartup.addListener(async () => {
       const newNotifications = [];
       data.animeList.forEach((anime) => {
         const airingDate = new Date(anime.airingDate);
-        if (
-          airingDate.getDate() === currentDate.getDate() ||
-          getMonthDateCompare(airingDate, listLastUpdateDate)
-        ) {
+        if (checkIfAnimeAired(airingDate, listLastUpdateDate, currentDate)) {
           anime.aired = airingDate.toISOString();
           anime.id = Math.random().toString(36).substr(2, 9);
           newNotifications.push(anime);

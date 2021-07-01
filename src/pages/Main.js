@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
 import Badge from "../components/NotificationBadge";
-import { parseDate } from "../utility/parseDate";
+import { formatDateToDateString } from "../utility/formatDateToDateString";
 
 const Main = ({
   toggleSettings,
@@ -55,7 +55,7 @@ const Main = ({
                 progressMax={episodes}
                 airingDay={airingDay}
                 type={type}
-                airingDate={parseDate(airingDate)}
+                airingDate={formatDateToDateString(airingDate)}
               />
             );
           }

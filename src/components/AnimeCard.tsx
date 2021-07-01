@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import ProgressBar from "./ProgressBar";
+import {UserData} from "../types/APITypes";
 
 const fadeIn = keyframes`
   from {
@@ -76,6 +77,12 @@ const StyledA = styled.a`
   }
 `;
 
+interface PropTypes extends UserData {
+  progress?: number;
+  progressMax?: number;
+  airingDateString: string
+}
+
 const AnimeCard = ({
   mal_id,
   imgUrl,
@@ -83,9 +90,9 @@ const AnimeCard = ({
   progress,
   progressMax,
   airingDay,
-  airingDate,
+  airingDateString,
   type,
-}) => (
+}:PropTypes):JSX.Element => (
   <Wrapper>
     <CardImg>
       <img src={imgUrl} alt="Anime poster" />
@@ -102,10 +109,10 @@ const AnimeCard = ({
     <Desc>
       <p>Type: {type}</p>
       <p>Next episode: {airingDay}</p>
-      <p>{airingDate}</p>
+      <p>{airingDateString}</p>
     </Desc>
     <ProgressBarWrapper>
-      <ProgressBar progress={progress} max={progressMax} />
+      <ProgressBar progress={progress || 0} max={progressMax} />
     </ProgressBarWrapper>
   </Wrapper>
 );

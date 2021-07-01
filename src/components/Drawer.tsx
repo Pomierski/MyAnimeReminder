@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { MotionProps } from "framer-motion/types/motion/types";
 
 const Wrapper = styled(motion.div)`
   padding: 0.5rem 2rem 0 2rem;
@@ -15,6 +16,10 @@ const Wrapper = styled(motion.div)`
   overflow-y: auto;
 `;
 
-const Drawer = (props) => <Wrapper {...props}>{props.children}</Wrapper>;
+interface PropTypes extends MotionProps {
+  children?: React.ReactNode
+}
+
+const Drawer = (props:PropTypes) => <Wrapper {...props}>{props.children}</Wrapper>;
 
 export default Drawer;

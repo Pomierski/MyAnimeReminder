@@ -1,10 +1,28 @@
 /*global chrome*/
 
+import { UserData } from "../types/APITypes";
+
 const nextMidnight = new Date().setHours(24, 0, 0, 0);
 
-const getFullScheudleForList = async (username) => {
-  const today = new Date();
-  const days = [
+interface FetchTypes extends UserData {
+  anime: Array<UserData>,
+  watched_episodes?: number,
+  episodes: number,
+  status: number
+  image_url: string
+}
+
+const fetchWatching = (username:string):Promise<FetchTypes> =>
+  fetch(`https://api.jikan.moe/v3/user/${username}/animelist/watching`).then(
+    (response) => {
+      if (response.ok) return response.json();
+      else return Promise.reject({ status: response.status });
+    }
+  );
+
+const getFullScheudleForList = async (username:string): Promise<Array<FetchTypes>> => {
+  const today:Date = new Date();
+  const days:Array<string> = [
     "monday",
     "tuesday",
     "wednesday",
@@ -13,13 +31,13 @@ const getFullScheudleForList = async (username) => {
     "saturday",
     "sunday",
   ];
-  let userListScheudle = [];
+  let userListScheudle:Array<any> = [];
 
   const animeList = await fetchWatching(username);
 
   for (const day of days) {
-    const capitalizeDay = day.charAt(0).toUpperCase() + day.slice(1);
-    const scheudle = await fetch(`https://api.jikan.moe/v3/schedule/${day}`)
+    const capitalizeDay:string = day.charAt(0).toUpperCase() + day.slice(1);
+    const scheudle:Array<FetchTypes> = await fetch(`https://api.jikan.moe/v3/schedule/${day}`)
       .then((resp) => resp.json())
       .then((resp) => resp[day]);
 
@@ -57,15 +75,7 @@ const getFullScheudleForList = async (username) => {
   return userListScheudle;
 };
 
-const fetchWatching = (username) =>
-  fetch(`https://api.jikan.moe/v3/user/${username}/animelist/watching`).then(
-    (response) => {
-      if (response.ok) return response.json();
-      else return Promise.reject({ status: response.status });
-    }
-  );
-
-export const fetchUserList = async (username) => {
+export const fetchUserList = async (username:string):Promise<{status: number}> => {
   const animeList = await getFullScheudleForList(username);
 
   if (animeList) {

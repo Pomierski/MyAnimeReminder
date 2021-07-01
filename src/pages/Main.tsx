@@ -8,6 +8,16 @@ import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
 import Badge from "../components/NotificationBadge";
 import { formatDateToDateString } from "../utility/formatDateToDateString";
+import { UserData } from "../types/APITypes";
+
+
+interface PropTypes {
+  toggleSettings(): void;
+  toggleNotifications(): void;
+  badgeText: number | null;
+  refreshData(): void;
+  animeList: Array<UserData> | null
+}
 
 const Main = ({
   toggleSettings,
@@ -15,7 +25,7 @@ const Main = ({
   badgeText,
   animeList,
   refreshData,
-}) => {
+}:PropTypes) => {
   return (
     <>
       <Header>
@@ -54,8 +64,9 @@ const Main = ({
                 progress={watched_episodes}
                 progressMax={episodes}
                 airingDay={airingDay}
+                airingDate={airingDate}
                 type={type}
-                airingDate={formatDateToDateString(airingDate)}
+                airingDateString={formatDateToDateString(airingDate)}
               />
             );
           }

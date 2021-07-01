@@ -6,6 +6,15 @@ import Notification from "../components/Notification";
 import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
 import Drawer from "../components/Drawer";
+import * as APITypes from "../types/APITypes";
+
+interface PropTypes {
+  showNotifications: boolean;
+  toggleNotifications(): void;
+  clearBadgeText(): void;
+  userNotifications: APITypes.Notifications | null;
+  deleteNotification(id: number): Promise<void>;
+}
 
 const Notifications = ({
   showNotifications,
@@ -13,7 +22,7 @@ const Notifications = ({
   clearBadgeText,
   userNotifications,
   deleteNotification,
-}) => {
+}:PropTypes) => {
   const variants = {
     open: { opacity: 1, x: 0 },
     closed: { opacity: 0, x: "-100%" },
@@ -36,11 +45,10 @@ const Notifications = ({
       {userNotifications && userNotifications.notifications.length ? (
         <>
           {userNotifications.notifications.map(
-            ({ image_url, title, airing_start, aired, id }) => (
+            ({ image_url, title, aired, id }:APITypes.Notification) => (
               <Notification
                 imgSrc={image_url}
                 title={title}
-                desc={airing_start}
                 aired={aired}
                 id={id}
                 deleteNotification={deleteNotification}

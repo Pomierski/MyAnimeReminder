@@ -1,6 +1,12 @@
 import styled, { css } from "styled-components";
 
-const Button = styled.button`
+interface PropTypes {
+  primary?: boolean | string,
+  icon?: boolean | string,
+  margin?: string
+}
+
+const Button = styled.button<PropTypes>`
   cursor: pointer;
   ${(props) =>
     props.primary &&

@@ -1,4 +1,5 @@
 /* global chrome */
+import {Notifications} from '../types/APITypes';
 
 export const userDataKey = "MARData";
 export const notificationsKey = "MARNotifications";
@@ -14,18 +15,18 @@ export const clearNotifications = () => {
   });
 };
 
-export const getStorageData = (key) =>
+export const getStorageData = (key:string[]):Promise<any> =>
   new Promise((resolve, reject) =>
     chrome.storage.sync.get(key, (result) =>
       chrome.runtime.lastError
         ? reject(Error(chrome.runtime.lastError.message))
-        : resolve(key in result ? result[key] : result)
+        : resolve(key[0] in result ? result.key : result)
     )
   );
 
-export const deleteNotification = async (id) => {
+export const deleteNotification = async (id:number):Promise<Notifications> => {
   const data = await getStorageData([notificationsKey]);
-  data.notifications = data.notifications.filter((el) => el.id !== id);
+  data.notifications = data.notifications.filter((el:{id: number}) => el.id !== id);
 
   chrome.storage.sync.set({
     MARNotifications: {

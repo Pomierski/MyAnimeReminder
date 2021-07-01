@@ -39,13 +39,19 @@ const Wrapper = styled.div`
   animation-fill-mode: forwards;
 `;
 
-const Login = ({ setUserLogged, getUserData }) => {
+interface PropTypes {
+  setUserLogged(boolean: boolean): void;
+  getUserData(): void;
+}
+
+const Login = ({ setUserLogged, getUserData }:PropTypes) => {
   const [inputValue, setInputValue] = useState("");
   const [showLoading, setShowLoading] = useState(false);
   const [showError, setShowError] = useState(false);
 
-  const handleInput = (e) => {
-    setInputValue(e.target.value);
+  const handleInput = (e:React.SyntheticEvent) => {
+    const target = e.target as HTMLInputElement;
+    setInputValue(target.value);
     setShowError(false);
   };
 

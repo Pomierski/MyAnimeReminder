@@ -1,6 +1,6 @@
-import React from "react";
 import styled from "styled-components";
 import { IoClose } from "react-icons/io5";
+import * as APITypes from "../types/APITypes";
 
 const Wrapper = styled.div`
   display: flex;
@@ -49,7 +49,11 @@ const DeleteButton = styled.button`
   border: 0;
 `;
 
-const Notification = ({ id, imgSrc, title, aired, deleteNotification }) => {
+interface PropTypes extends APITypes.Notification {
+  deleteNotification(id: number): void
+}
+
+const Notification = ({ id, imgSrc, title, aired, deleteNotification }:PropTypes):JSX.Element =>{
   const airedDateString = new Date(aired).toLocaleString("en-us", {
     day: "2-digit",
     month: "long",

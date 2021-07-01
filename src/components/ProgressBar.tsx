@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-const Bar = styled.div`
+const Bar = styled.div<PropTypes>`
   height: 100%;
   width: 100%;
   background: ${(props) => props.theme.accentColor};
@@ -36,7 +36,12 @@ const Value = styled.div`
   z-index: 2;
 `;
 
-const ProgressBar = ({ progress, max }) => (
+interface PropTypes {
+  progress: number,
+  max?: number
+}
+
+const ProgressBar = ({ progress, max }:PropTypes):JSX.Element => (
   <Wrapper>
     <Value>
       {progress} / {max || "?"}

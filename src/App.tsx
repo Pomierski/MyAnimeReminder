@@ -7,6 +7,7 @@ import Main from "./pages/Main";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import { fetchUserList } from "./utility/fetchUserList";
+import * as APITypes from "./types/APITypes";
 
 const Container = styled.div`
   width: 400px;
@@ -19,10 +20,11 @@ const Container = styled.div`
   color: ${(props) => props.theme.mainColor};
 `;
 
+
 function App() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<APITypes.UserData | null>(null);
   const [userLogged, setUserLogged] = useState(false);
-  const [userNotifications, setUserNotifications] = useState(null);
+  const [userNotifications, setUserNotifications] = useState<APITypes.Notifications | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -43,30 +45,31 @@ function App() {
     getUserData();
   }, []);
 
-  const refreshData = async () => {
-    setUserData(null);
-    await fetchUserList(userData.username);
+  const refreshData = async ():Promise<void> => {
+    if(userData && userData.username) {
+      await fetchUserList(userData.username);
+    }
     getUserData();
   };
 
-  const clearBadgeText = () => {
+  const clearBadgeText = ():void => {
     chromeAPI.clearNotifications();
     setUserNotifications(null);
   };
 
-  const toggleSettings = () => {
+  const toggleSettings = ():void => {
     setShowSettings(!showSettings);
   };
 
-  const toggleNotifications = () => {
+  const toggleNotifications = ():void => {
     setShowNotifications(!showNotifications);
   };
 
-  const deleteNotification = async (id) => {
+  const deleteNotification = async (id:number):Promise<void> => {
     setUserNotifications(await chromeAPI.deleteNotification(id));
   };
 
-  const logout = () => {
+  const logout = ():void => {
     chromeAPI.clearStorage();
     setUserLogged(false);
     setShowSettings(false);
@@ -91,7 +94,7 @@ function App() {
                 showSettings={showSettings}
                 logout={logout}
                 toggleSettings={toggleSettings}
-                loggedInUser={userData ? userData.username : null}
+                loggedInUser={userData && userData.username ? userData.username : null}
               />
               <Main
                 toggleSettings={toggleSettings}
@@ -101,7 +104,7 @@ function App() {
                     ? userNotifications.notifications.length
                     : null
                 }
-                animeList={userData ? userData.animeList : null}
+                animeList={userData && userData.animeList ? userData.animeList : null}
                 refreshData={refreshData}
               />
             </>

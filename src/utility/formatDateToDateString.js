@@ -4,14 +4,14 @@ export const setTimeToMidnight = (date) => {
   return fixedDate;
 };
 
-export const parseDate = (date) => {
+export const formatDateToDateString = (date) => {
   date = new Date(date);
   date = setTimeToMidnight(date);
-  const parsedDate = date.toLocaleDateString("en", {
+  const formatedDate = date.toLocaleDateString("en", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  return parsedDate;
+  return formatedDate;
 };

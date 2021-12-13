@@ -1,13 +1,22 @@
 import React from "react";
-import Heading from "../components/Header/Heading";
-import AnimeCard from "../components/AnimeCard";
-import { BiCog, BiBell } from "react-icons/bi";
+import { BiBell, BiCog } from "react-icons/bi";
 import { IoMdRefresh } from "react-icons/io";
+import AnimeCard from "../components/AnimeCard";
 import Button from "../components/Button";
 import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
+import Heading from "../components/Header/Heading";
 import Badge from "../components/NotificationBadge";
+import { APIData } from "../types/APIData";
 import { formatDateToDateString } from "../utility/formatDateToDateString";
+
+interface PropTypes {
+  toggleSettings(): void;
+  toggleNotifications(): void;
+  badgeText: number | null;
+  refreshData(): void;
+  animeList: Array<APIData> | null;
+}
 
 const Main = ({
   toggleSettings,
@@ -15,7 +24,7 @@ const Main = ({
   badgeText,
   animeList,
   refreshData,
-}) => {
+}: PropTypes) => {
   return (
     <>
       <Header>
@@ -51,11 +60,11 @@ const Main = ({
                 key={mal_id}
                 title={title}
                 imgUrl={image_url}
-                progress={watched_episodes}
+                progress={watched_episodes || 0}
                 progressMax={episodes}
                 airingDay={airingDay}
                 type={type}
-                airingDate={formatDateToDateString(airingDate)}
+                airingDate={formatDateToDateString(airingDate as string)}
               />
             );
           }

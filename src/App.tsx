@@ -1,11 +1,12 @@
 import { useLayoutEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
-import { theme } from "./styles/theme";
-import * as chromeAPI from "./utility/chromeAPI";
 import Login from "./pages/Login";
 import Main from "./pages/Main";
-import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
+import Settings from "./pages/Settings";
+import { theme } from "./styles/theme";
+import * as APIData from "./types/APIData";
+import * as chromeAPI from "./utility/chromeAPI";
 import { fetchUserList } from "./utility/fetchUserList";
 
 const Container = styled.div`
@@ -20,16 +21,17 @@ const Container = styled.div`
 `;
 
 function App() {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<APIData.APIData | null>(null);
   const [userLogged, setUserLogged] = useState(false);
-  const [userNotifications, setUserNotifications] = useState(null);
+  const [userNotifications, setUserNotifications] =
+    useState<APIData.Notifications | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const getUserData = async () => {
+  const getUserData = async (): Promise<void> => {
     const [savedData, savedNotifications] = await Promise.all([
-      chromeAPI.getStorageData([chromeAPI.userDataKey]),
-      chromeAPI.getStorageData([chromeAPI.notificationsKey]),
+      chromeAPI.getStorageData(chromeAPI.userDataKey),
+      chromeAPI.getStorageData(chromeAPI.notificationsKey),
     ]);
     if (Object.keys(savedData).length) {
       setUserData(savedData);
@@ -43,26 +45,28 @@ function App() {
     getUserData();
   }, []);
 
-  const refreshData = async () => {
-    setUserData(null);
-    await fetchUserList(userData.username);
-    getUserData();
+  const refreshData = async (): Promise<void> => {
+    if (userData?.username) {
+      setUserData(null);
+      await fetchUserList(userData.username);
+      getUserData();
+    }
   };
 
-  const clearBadgeText = () => {
+  const clearBadgeText = (): void => {
     chromeAPI.clearNotifications();
     setUserNotifications(null);
   };
 
-  const toggleSettings = () => {
+  const toggleSettings = (): void => {
     setShowSettings(!showSettings);
   };
 
-  const toggleNotifications = () => {
+  const toggleNotifications = (): void => {
     setShowNotifications(!showNotifications);
   };
 
-  const deleteNotification = async (id) => {
+  const deleteNotification = async (id: number): Promise<void> => {
     setUserNotifications(await chromeAPI.deleteNotification(id));
   };
 
@@ -91,17 +95,13 @@ function App() {
                 showSettings={showSettings}
                 logout={logout}
                 toggleSettings={toggleSettings}
-                loggedInUser={userData ? userData.username : null}
+                loggedInUser={userData?.username || null}
               />
               <Main
                 toggleSettings={toggleSettings}
                 toggleNotifications={toggleNotifications}
-                badgeText={
-                  userNotifications
-                    ? userNotifications.notifications.length
-                    : null
-                }
-                animeList={userData ? userData.animeList : null}
+                badgeText={userNotifications?.notifications?.length || null}
+                animeList={userData?.animeList || null}
                 refreshData={refreshData}
               />
             </>

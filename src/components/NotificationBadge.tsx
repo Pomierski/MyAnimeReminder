@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   z-index: 2;
 `;
 
-const Badge = ({ children }) => (
+const Badge: React.FC = ({ children }) => (
   <>{children ? <Wrapper>{children}</Wrapper> : null}</>
 );
 

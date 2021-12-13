@@ -1,8 +1,10 @@
 /*global chrome*/
 
+import { APIData, Status, UserList } from "../types/APIData";
+
 const nextMidnight = new Date().setHours(24, 0, 0, 0);
 
-const getFullScheudleForList = async (username) => {
+const getFullScheudleForList = async (username: string) => {
   const today = new Date();
   const days = [
     "monday",
@@ -13,13 +15,15 @@ const getFullScheudleForList = async (username) => {
     "saturday",
     "sunday",
   ];
-  let userListScheudle = [];
+  let userListScheudle: Partial<APIData>[] = [];
 
-  const animeList = await fetchWatching(username);
+  const animeList: UserList = await fetchWatching(username);
 
   for (const day of days) {
     const capitalizeDay = day.charAt(0).toUpperCase() + day.slice(1);
-    const scheudle = await fetch(`https://api.jikan.moe/v3/schedule/${day}`)
+    const scheudle: APIData[] = await fetch(
+      `https://api.jikan.moe/v3/schedule/${day}`
+    )
       .then((resp) => resp.json())
       .then((resp) => resp[day]);
 
@@ -57,15 +61,15 @@ const getFullScheudleForList = async (username) => {
   return userListScheudle;
 };
 
-const fetchWatching = (username) =>
+const fetchWatching = (username: string): Promise<UserList> =>
   fetch(`https://api.jikan.moe/v3/user/${username}/animelist/watching`).then(
     (response) => {
       if (response.ok) return response.json();
-      else return Promise.reject({ status: response.status });
+      else Promise.reject({ status: response.status });
     }
   );
 
-export const fetchUserList = async (username) => {
+export const fetchUserList = async (username: string): Promise<Status> => {
   const animeList = await getFullScheudleForList(username);
 
   if (animeList) {

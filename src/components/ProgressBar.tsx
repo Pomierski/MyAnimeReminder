@@ -1,5 +1,10 @@
 import styled from "styled-components";
 
+interface PropTypes {
+  progress: number;
+  max?: number;
+}
+
 const Wrapper = styled.div`
   width: 100%;
   height: 1.3rem;
@@ -8,7 +13,7 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-const Bar = styled.div`
+const Bar = styled.div<PropTypes>`
   height: 100%;
   width: 100%;
   background: ${(props) => props.theme.accentColor};
@@ -36,7 +41,7 @@ const Value = styled.div`
   z-index: 2;
 `;
 
-const ProgressBar = ({ progress, max }) => (
+const ProgressBar = ({ progress, max }: PropTypes) => (
   <Wrapper>
     <Value>
       {progress} / {max || "?"}

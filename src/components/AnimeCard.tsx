@@ -1,6 +1,12 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
+import { APIData } from "../types/APIData";
 import ProgressBar from "./ProgressBar";
+
+interface PropTypes extends APIData {
+  progress: number;
+  progressMax?: number;
+}
 
 const fadeIn = keyframes`
   from {
@@ -85,7 +91,7 @@ const AnimeCard = ({
   airingDay,
   airingDate,
   type,
-}) => (
+}: PropTypes) => (
   <Wrapper>
     <CardImg>
       <img src={imgUrl} alt="Anime poster" />

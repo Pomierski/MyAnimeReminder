@@ -1,12 +1,24 @@
 import React from "react";
-import Button from "../components/Button";
-import Heading from "../components/Header/Heading";
 import { IoClose } from "react-icons/io5";
+import Button from "../components/Button";
+import Drawer from "../components/Drawer";
 import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
-import Drawer from "../components/Drawer";
+import Heading from "../components/Header/Heading";
 
-const Settings = ({ logout, showSettings, toggleSettings, loggedInUser }) => {
+interface PropTypes {
+  logout(): void;
+  showSettings: boolean;
+  toggleSettings(): void;
+  loggedInUser: string | null;
+}
+
+const Settings = ({
+  logout,
+  showSettings,
+  toggleSettings,
+  loggedInUser,
+}: PropTypes) => {
   const variants = {
     open: { opacity: 1, x: 0 },
     closed: { opacity: 0, x: "100%" },

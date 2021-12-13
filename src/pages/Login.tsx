@@ -1,13 +1,18 @@
+import { motion } from "framer-motion";
 import React, { useState } from "react";
+import styled, { keyframes } from "styled-components";
 import Button from "../components/Button";
 import Header from "../components/Header/Header";
 import Heading from "../components/Header/Heading";
-import SubTitle from "../components/SubTitle";
 import Input from "../components/Input";
-import { motion } from "framer-motion";
 import Loader from "../components/Loader";
-import styled, { keyframes } from "styled-components";
+import SubTitle from "../components/SubTitle";
 import { fetchUserList } from "../utility/fetchUserList";
+
+interface PropTypes {
+  setUserLogged(boolean: boolean): void;
+  getUserData(): void;
+}
 
 const StyledLoader = styled(Loader)`
   position: absolute;
@@ -39,17 +44,17 @@ const Wrapper = styled.div`
   animation-fill-mode: forwards;
 `;
 
-const Login = ({ setUserLogged, getUserData }) => {
+const Login = ({ setUserLogged, getUserData }: PropTypes) => {
   const [inputValue, setInputValue] = useState("");
   const [showLoading, setShowLoading] = useState(false);
   const [showError, setShowError] = useState(false);
 
-  const handleInput = (e) => {
+  const handleInput = (e: { target: HTMLInputElement }): void => {
     setInputValue(e.target.value);
     setShowError(false);
   };
 
-  const handleButton = async () => {
+  const handleButton = async (): Promise<void> => {
     setShowLoading(true);
     const userList = await fetchUserList(inputValue).catch((e) => e);
     if (userList.status !== 200) {

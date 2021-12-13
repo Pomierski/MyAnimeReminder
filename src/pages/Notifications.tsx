@@ -1,11 +1,20 @@
 import React from "react";
-import Heading from "../components/Header/Heading";
 import { IoClose } from "react-icons/io5";
 import Button from "../components/Button";
-import Notification from "../components/Notification";
+import Drawer from "../components/Drawer";
 import Header from "../components/Header/Header";
 import HeaderButtons from "../components/Header/HeaderButtons";
-import Drawer from "../components/Drawer";
+import Heading from "../components/Header/Heading";
+import Notification from "../components/Notification";
+import * as APIData from "../types/APIData";
+
+interface PropTypes {
+  showNotifications: boolean;
+  toggleNotifications(): void;
+  clearBadgeText(): void;
+  userNotifications: APIData.Notifications | null;
+  deleteNotification(id: number): Promise<void>;
+}
 
 const Notifications = ({
   showNotifications,
@@ -13,7 +22,7 @@ const Notifications = ({
   clearBadgeText,
   userNotifications,
   deleteNotification,
-}) => {
+}: PropTypes) => {
   const variants = {
     open: { opacity: 1, x: 0 },
     closed: { opacity: 0, x: "-100%" },
@@ -33,14 +42,13 @@ const Notifications = ({
           </Button>
         </HeaderButtons>
       </Header>
-      {userNotifications && userNotifications.notifications.length ? (
+      {userNotifications && userNotifications?.notifications?.length ? (
         <>
-          {userNotifications.notifications.map(
-            ({ image_url, title, airing_start, aired, id }) => (
+          {userNotifications?.notifications?.map(
+            ({ image_url, title, aired, id }) => (
               <Notification
                 imgSrc={image_url}
                 title={title}
-                desc={airing_start}
                 aired={aired}
                 id={id}
                 deleteNotification={deleteNotification}

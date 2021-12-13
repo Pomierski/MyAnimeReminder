@@ -3,7 +3,7 @@
 
   "name": "MyAnimeReminder",
   "description": "Don't miss the latest episodes release",
-  "version": "0.0.63",
+  "version": "0.0.64",
 
   "browser_action": {
     "default_popup": "index.html",
